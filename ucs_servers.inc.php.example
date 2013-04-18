@@ -1,0 +1,14 @@
+<?php
+
+// Provide a list of UCS servers here in the form of a php array.
+// Just itterate the server instance number and provide a
+// user and password for each server.
+
+$ucs_srv_list['1']['srv'] = 'ucsserver1.example.com';
+$ucs_srv_list['1']['user'] = 'user1';
+$ucs_srv_list['1']['pass'] = 'pass1';
+$ucs_srv_list['2']['srv'] = 'ucsserver2.example.com';
+$ucs_srv_list['2']['user'] = 'user2';
+$ucs_srv_list['2']['pass'] = 'pass2';
+
+?>
