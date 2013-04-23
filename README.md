@@ -2,7 +2,8 @@
 
 This plugin provides a high level view of the Chassis and Blades that are associated with each Fabric Interconnect.
 You can see the profile name and status of each blade.  When you hover over a blade you can see serial numbers
-and other hardware specifications of that blade.
+and other hardware specifications of that blade.  It is not the intention of this plugin to provide extensive abilities within the UCS system.
+It is merely to gather basic information about the UCS environment and provide a quick overall status within ONA.
 
 ## Install
 
