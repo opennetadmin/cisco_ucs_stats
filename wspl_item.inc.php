@@ -99,6 +99,7 @@ EOL;
 	$bladeinfo = array();
 	$htmlinfo = array();
         $UCS_SERVER=$srv['srv'].':443';
+        $bladeCount=0;
 
         # Log in to the UCS system and get a cookie. YUM
         $LOGIN['inName']=$srv['user'];
@@ -139,10 +140,13 @@ EOL;
         list($ucsstat,$LOGOUT) = UCS_XML_request($UCS_SERVER, "aaaLogout", array('inCookie'=>$COOKIE['outCookie']));
 
 
+        # Sort the list
+        ksort($blade_data->xpath("//computeBlade"));
 
-        // Loop through blade information
+        # Loop through blade information
         foreach ($blade_data->xpath("//computeBlade") as $blade) {
             $y++;
+            $bladeCount++;
             $color = '';
             $ucs_srv_name = '';
             $ucsnamestyle = 'style="border-top: none;border-bottom: none;"';
@@ -165,10 +169,11 @@ EOL;
             $bladeinfo["{$blade[chassisId]}{$blade[slotId]}"]['htmlline'] = <<<EOL
             <tr onMouseOver="this.className='row-highlight';" onMouseOut="this.className='row-normal';">
 EOL;
-            if ("{$blade[chassisId]}{$blade[slotId]}" == '11') {
+            if ($bladeCount == 1) {
             	$ucs_srv_name = $srv['srv'];
                 $ucsnamestyle = 'style="border-top: 1px solid;border-bottom: none;"';
             }
+
 
             $bladeinfo["{$blade[chassisId]}{$blade[slotId]}"]['htmlline'] .= <<<EOL
                 <td class="list-row" {$ucsnamestyle} ><a href="https://{$srv['srv']}/ucsm/ucsm.jnlp" title="Click to open UCS Manager">{$ucs_srv_name}</a></td>
@@ -207,8 +212,6 @@ EOL;
                 <tr onMouseOver="this.className='row-highlight';" onMouseOut="this.className='row-normal';"><td class="list-row">{$srv['srv']}&nbsp;&nbsp;</td><td class="list-row" colspan="5">Unable to gather blade info.</td></tr>
 EOL;
         }
-
-        ksort($bladeinfo);
 
         foreach ($bladeinfo as $htmlinfo) {
             $htmllines .= $htmlinfo['htmlline'];
