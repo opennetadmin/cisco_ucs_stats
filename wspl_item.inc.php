@@ -95,9 +95,9 @@ EOL;
 
     // Lets loop through each of the provided UCS servers and get their data
     foreach ($ucs_srv_list as $srv) {
-	$blade_data = array();
-	$bladeinfo = array();
-	$htmlinfo = array();
+        $blade_data = array();
+        $bladeinfo = array();
+        $htmlinfo = array();
         $UCS_SERVER=$srv['srv'].':443';
         $bladeCount=0;
 
@@ -129,7 +129,14 @@ EOL;
         	if ($ITEM[ack] == "yes") $SUMMARY[ack_count] += 1;
 	}
 
+        // Gather data about service profiles
+        $confresolve['classId']='lsServer';
+        $confresolve['inHierarchical']='false';
+        $confresolve['cookie']=$COOKIE['outCookie'];
 
+        list($ucsstat,$serviceprofile_data) = UCS_XML_request($UCS_SERVER, "configResolveClass", $confresolve);
+
+        // Gather data about physical blades
         $confresolve['classId']='computeBlade';
         $confresolve['inHierarchical']='false';
         $confresolve['cookie']=$COOKIE['outCookie'];
@@ -160,6 +167,11 @@ EOL;
                     $color = "#FF7375"; break;
             }
 
+            // For this blade, gather service profile info
+            $sp_info = '';
+            $userlabelp = '';
+            $sp_info = $serviceprofile_data->xpath("//outConfigs/lsServer[@dn='{$blade[assignedToDn]}']");
+            if ($sp_info[0]['usrLbl']) $userlabelp = "({$sp_info[0]['usrLbl']})";
 
             // Clean up the name a bit
             $blade[assignedToDn] = substr($blade[assignedToDn],12);
@@ -196,9 +208,10 @@ EOL;
                     <input type="hidden" name="totalmem" value="{$blade[totalMemory]}"/>
                     <input type="hidden" name="powerstate" value="{$blade[operPower]}"/>
                     <input type="hidden" name="dn" value="{$blade[dn]}"/>
+                    <input type="hidden" name="usrlbl" value="{$sp_info[0]['usrLbl']}"/>
                     <input type="hidden" name="ucssrv" value="{$srv['srv']}"/>
                     </form>
-                    {$blade[assignedToDn]}
+                    {$blade[assignedToDn]} {$userlabelp}
                 </td>
                 <td class="list-row">{$blade[operPower]}</td>
                 <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
@@ -275,6 +288,11 @@ EOL;
     <tr><td colspan="2" align="center" class="qf-search-line" style="{$style['label_box']}; padding-top: 0px;" onMouseDown="dragStart(event, '{$form['id']}', 'savePosition', 0);" nowrap="true">
         Service Profile: {$form['profile']}
     </td></tr>
+
+    <tr>
+        <td align="right" class="qf-search-line" style="font-weight: bold;" nowrap="true">User Label</td>
+        <td align="left" class="qf-search-line" nowrap="true">{$form['usrlbl']}</td>
+    </tr>
 
     <tr>
         <td align="right" class="qf-search-line" style="font-weight: bold;" nowrap="true">Serial #</td>
