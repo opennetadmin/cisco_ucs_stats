@@ -77,7 +77,6 @@ function ws_ucs_display_stats($window_name, $form='') {
     // If an array in a string was provided, build the array and store it in $form
     $form = parse_options_string($form);
 
-
     // Get the hosts having ucs_manager CA
 //    list($status, $rows, $ucshosts) = db_get_records($onadb, 'custom_attributes', "custom_attribute_type_id in (select id from custom_attribute_types where name='ucs_manager') and table_name_ref = 'hosts' and value = 'Y'");
 //    if ($rows) {
@@ -86,6 +85,11 @@ function ws_ucs_display_stats($window_name, $form='') {
 //            array_push($srv_list, $host['fqdn']);
 //        }
 //    }
+    if (!is_readable(dirname(__FILE__) . '/ucs_servers.inc.php')) {
+            $htmllines .= <<<EOL
+                <tr onMouseOver="this.className='row-highlight';" onMouseOut="this.className='row-normal';"><td class="list-row" colspan="5">Unable to open config file.</td></tr>
+EOL;
+    } else {
     @require_once(dirname(__FILE__) . '/ucs_servers.inc.php');
     if (!isset($ucs_srv_list['1'])) {
             $htmllines .= <<<EOL
@@ -241,6 +245,7 @@ EOL;
                   </td>
                 </tr>
 EOL;
+    } // end config file check
     $html .= $htmllines;
     $html .= "</table>";
 
