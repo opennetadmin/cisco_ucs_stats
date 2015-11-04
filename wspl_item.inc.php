@@ -56,7 +56,7 @@ $divid='';
 Using curl, gather all of the data from the ucs systems and update the status
 */
 function ws_ucs_display_stats($window_name, $form='') {
-    global $conf, $self, $onadb, $base, $images, $baseURL;
+    global $conf, $self, $onadb, $onabase, $base, $images, $baseURL;
 
     // Get info about this file name
     $onainstalldir = dirname($base);
@@ -85,12 +85,15 @@ function ws_ucs_display_stats($window_name, $form='') {
 //            array_push($srv_list, $host['fqdn']);
 //        }
 //    }
-    if (!is_readable(dirname(__FILE__) . '/ucs_servers.inc.php')) {
+
+    // Get the config file
+    $conffile = (file_exists($onabase.'/etc/cisco_ucs_stats.conf.php')) ? $onabase.'/etc/cisco_ucs_stats.conf.php' : dirname(__FILE__).'/cisco_ucs_stats.conf.php';
+    if (!is_readable($conffile)) {
             $htmllines .= <<<EOL
                 <tr onMouseOver="this.className='row-highlight';" onMouseOut="this.className='row-normal';"><td class="list-row" colspan="5">Unable to open config file.</td></tr>
 EOL;
     } else {
-    @require_once(dirname(__FILE__) . '/ucs_servers.inc.php');
+    @require_once($conffile);
     if (!isset($ucs_srv_list['1'])) {
             $htmllines .= <<<EOL
                 <tr onMouseOver="this.className='row-highlight';" onMouseOut="this.className='row-normal';"><td class="list-row" colspan="5">No UCS servers defined via config file.</td></tr>
@@ -152,10 +155,11 @@ EOL;
 
 
         # Sort the list
-        ksort($blade_data->xpath("//computeBlade"));
+        $computeblade = $blade_data->xpath("//computeBlade");
+        ksort($computeblade);
 
         # Loop through blade information
-        foreach ($blade_data->xpath("//computeBlade") as $blade) {
+        foreach ($computeblade as $blade) {
             $y++;
             $bladeCount++;
             $color = '';

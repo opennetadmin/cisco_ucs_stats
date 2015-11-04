@@ -1,2 +1,2 @@
 # ignore the local version of the config
-ucs_servers.inc.php
+cisco_ucs_stats.conf.php

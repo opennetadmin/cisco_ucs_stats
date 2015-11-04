@@ -1,5 +1,8 @@
 <?php
 
+// This file should be copied to /opt/ona/etc/cisco_ucs_stats.conf.php
+// and then updated with valid passwords
+//
 // Provide a list of UCS servers here in the form of a php array.
 // Just itterate the server instance number and provide a
 // user and password for each server.
